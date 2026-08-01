@@ -1,0 +1,123 @@
+---
+// GERİ SAYIM — ilk fotoğrafın hemen altında, bütün bir blok hâlinde.
+interface Props {
+  tarihISO: string;
+}
+const { tarihISO } = Astro.props;
+---
+
+<section class="bolum gerisayim reveal" aria-label="Etkinliğe kalan süre">
+  <p class="gs-ust">Büyük güne kalan süre</p>
+  <div class="gs-kart" id="gerisayim" data-hedef={tarihISO} role="timer" aria-live="polite">
+    <div class="gs-kutu"><span class="gs-sayi" data-gun>--</span><span class="gs-etiket">Gün</span></div>
+    <span class="gs-ayrac" aria-hidden="true">:</span>
+    <div class="gs-kutu"><span class="gs-sayi" data-saat>--</span><span class="gs-etiket">Saat</span></div>
+    <span class="gs-ayrac" aria-hidden="true">:</span>
+    <div class="gs-kutu"><span class="gs-sayi" data-dakika>--</span><span class="gs-etiket">Dakika</span></div>
+    <span class="gs-ayrac" aria-hidden="true">:</span>
+    <div class="gs-kutu"><span class="gs-sayi" data-saniye>--</span><span class="gs-etiket">Saniye</span></div>
+  </div>
+  <p class="gs-bitti" id="gs-bitti" hidden>Bugün o gün! 🎉</p>
+</section>
+
+<style>
+  /* Tam ekran değil: ilk fotoğrafın altında kompakt, bütün bir blok */
+  .gerisayim {
+    min-height: auto;
+    scroll-snap-align: none;
+    padding: 34px 20px 40px;
+    text-align: center;
+    background: linear-gradient(180deg, var(--ink), #16281f);
+  }
+  .gs-ust {
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    color: var(--clay);
+    margin: 0 0 16px;
+  }
+  .gs-kart {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 4px;
+    max-width: 420px;
+    margin: 0 auto;
+    padding: 18px 8px;
+    border: 1px solid rgba(167, 190, 176, 0.22);
+    border-radius: var(--radius);
+    background: rgba(167, 190, 176, 0.06);
+  }
+  .gs-kutu {
+    display: grid;
+    gap: 5px;
+    min-width: 60px;
+  }
+  .gs-sayi {
+    font-family: var(--font-baslik);
+    font-size: clamp(1.7rem, 8.5vw, 2.5rem);
+    color: var(--ivory);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+  .gs-etiket {
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--sage);
+  }
+  .gs-ayrac {
+    font-family: var(--font-baslik);
+    font-size: 1.7rem;
+    color: var(--clay);
+    line-height: 1;
+    margin-top: 3px;
+    opacity: 0.55;
+    animation: yanip 1s steps(2, start) infinite;
+  }
+  .gs-bitti {
+    font-family: var(--font-baslik);
+    font-size: 1.4rem;
+    color: var(--clay);
+    margin-top: 20px;
+  }
+  @keyframes yanip { 50% { opacity: 0.15; } }
+  @media (prefers-reduced-motion: reduce) {
+    .gs-ayrac { animation: none; }
+  }
+</style>
+
+<script>
+  const kok = document.getElementById('gerisayim');
+  if (kok) {
+    const hedef = new Date(kok.dataset.hedef as string).getTime();
+    const g = kok.querySelector('[data-gun]')!;
+    const s = kok.querySelector('[data-saat]')!;
+    const d = kok.querySelector('[data-dakika]')!;
+    const sn = kok.querySelector('[data-saniye]')!;
+    const bitti = document.getElementById('gs-bitti');
+
+    const ikiHane = (n: number) => String(n).padStart(2, '0');
+
+    function guncelle() {
+      const fark = hedef - Date.now();
+      if (fark <= 0) {
+        g.textContent = s.textContent = d.textContent = sn.textContent = '00';
+        if (bitti) bitti.hidden = false;
+        clearInterval(timer);
+        return;
+      }
+      const gun = Math.floor(fark / 86400000);
+      const saat = Math.floor((fark % 86400000) / 3600000);
+      const dk = Math.floor((fark % 3600000) / 60000);
+      const sni = Math.floor((fark % 60000) / 1000);
+      g.textContent = String(gun);
+      s.textContent = ikiHane(saat);
+      d.textContent = ikiHane(dk);
+      sn.textContent = ikiHane(sni);
+    }
+
+    guncelle();
+    const timer = setInterval(guncelle, 1000);
+  }
+</script>

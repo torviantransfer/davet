@@ -1,0 +1,139 @@
+---
+// AÇILIŞ EKRANI — tam ekran, monogram animasyonu, "Davetiyeyi aç" butonu.
+// Tıklanınca kapanır ve (varsa) fon müziği başlar.
+interface Props {
+  monogram: string;
+  etkinlikTuru: string;
+  muzikSrc?: string;
+}
+const { monogram, etkinlikTuru, muzikSrc } = Astro.props;
+
+// Açılış ekranında süzülen yapraklar
+const yapraklar = Array.from({ length: 8 });
+---
+
+<div class="acilis" id="acilis" role="dialog" aria-label="Davetiye açılış ekranı">
+  <div class="acilis-yaprak" aria-hidden="true">
+    {yapraklar.map((_, i) => (
+      <span
+        class="ac-yaprak"
+        style={`left:${(i * 13 + 6) % 92}%; animation-delay:${(i * 1.1).toFixed(1)}s; animation-duration:${8 + (i % 3)}s; --b:${7 + (i % 3) * 3}px`}
+      ></span>
+    ))}
+  </div>
+  <div class="acilis-ic">
+    <p class="acilis-tur">{etkinlikTuru} Davetiyesi</p>
+    <div class="monogram" aria-hidden="true">{monogram}</div>
+    <span class="acilis-cizgi" aria-hidden="true"></span>
+    <button type="button" class="btn acilis-btn" id="acilis-ac">Davetiyeyi Aç</button>
+  </div>
+</div>
+
+{muzikSrc && <audio id="fon-muzik" src={muzikSrc} loop preload="none"></audio>}
+
+<style>
+  .acilis {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: grid;
+    place-items: center;
+    background:
+      radial-gradient(120% 90% at 50% 0%, #2a3a31 0%, var(--ink) 60%);
+    text-align: center;
+    padding: 24px;
+    transition: opacity .8s ease, visibility .8s ease;
+  }
+  .acilis.kapali {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+  .acilis-yaprak {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .ac-yaprak {
+    position: absolute;
+    top: -8%;
+    width: var(--b);
+    height: calc(var(--b) * 1.15);
+    background: linear-gradient(var(--clay-2), var(--clay));
+    border-radius: 50% 0 50% 50%;
+    opacity: 0.5;
+    animation-name: acdus;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+  }
+  @keyframes acdus {
+    0%   { transform: translateY(0) rotate(0deg); opacity: 0; }
+    12%  { opacity: 0.55; }
+    100% { transform: translateY(105vh) translateX(40px) rotate(300deg); opacity: 0.1; }
+  }
+  .acilis-ic {
+    display: grid;
+    justify-items: center;
+    gap: 22px;
+    position: relative;
+    z-index: 1;
+    animation: yuksel 1s ease both;
+  }
+  .acilis-tur {
+    letter-spacing: 0.34em;
+    text-transform: uppercase;
+    font-size: 0.72rem;
+    color: var(--sage);
+    margin: 0;
+  }
+  .monogram {
+    font-family: var(--font-baslik);
+    font-size: clamp(4rem, 26vw, 7rem);
+    color: var(--ivory);
+    line-height: 1;
+    position: relative;
+    animation: nefes 4.5s ease-in-out infinite;
+  }
+  .acilis-cizgi {
+    width: 1px;
+    height: 54px;
+    background: linear-gradient(var(--clay), transparent);
+  }
+  .acilis-btn { --bg: var(--clay); }
+
+  @keyframes yuksel {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: none; }
+  }
+  @keyframes nefes {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.045); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .acilis-ic, .monogram { animation: none; }
+    .acilis { transition: none; }
+    .acilis-yaprak { display: none; }
+  }
+</style>
+
+<script>
+  import { konfetiPatlat } from '../scripts/confetti';
+  const acilis = document.getElementById('acilis');
+  const acBtn = document.getElementById('acilis-ac');
+  const muzik = document.getElementById('fon-muzik') as HTMLAudioElement | null;
+
+  acBtn?.addEventListener('click', () => {
+    acilis?.classList.add('kapali');
+    document.body.style.overflow = '';
+    // Kutlama: konfeti patlaması
+    konfetiPatlat({ y: window.innerHeight * 0.42, adet: 170 });
+    if (muzik) {
+      muzik.volume = 0.5;
+      muzik.play().catch(() => { /* tarayıcı engellerse sessizce geç */ });
+    }
+  });
+
+  // Açılış ekranı açıkken arka planın kaymasını engelle
+  document.body.style.overflow = 'hidden';
+</script>

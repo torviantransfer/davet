@@ -1,0 +1,172 @@
+---
+// VİTRİN — stüdyonun ana sayfası. Tüm şablonları kart olarak gösterir.
+// Müşteriye "böyle bir şey yapıyorum" diyeceğin sayfa.
+import { davetiyeler } from '../data';
+import Icon from '../components/Icon.astro';
+import '../styles/global.css';
+
+const gosterilecek = davetiyeler.filter((d) => d.vitrindeGoster);
+const canonical = new URL('/', Astro.site).href;
+const ogGorsel = new URL('/og-vitrin.jpg', Astro.site).href;
+---
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Dijital Davetiye Stüdyosu — Düğün, Doğum Günü, Açılış</title>
+  <meta name="description" content="Telefonda açılan, WhatsApp'ta görselli önizleme çıkan modern dijital davetiyeler. Düğün, nişan, kına, doğum günü, açılış ve kurumsal etkinlikler için." />
+
+  <!-- Vitrin sayfası için Open Graph. og-vitrin.jpg görselini public/ klasörüne koy (1200x630). -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Dijital Davetiye Stüdyosu" />
+  <meta property="og:description" content="Telefonda açılan modern dijital davetiyeler — düğün, doğum günü, açılış ve daha fazlası." />
+  <meta property="og:image" content={ogGorsel} />
+  <meta property="og:url" content={canonical} />
+  <meta property="og:locale" content="tr_TR" />
+  <meta name="theme-color" content="#1E2B25" />
+  <link rel="canonical" href={canonical} />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Manrope:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+</head>
+<body>
+  <main class="vitrin">
+    <header class="vitrin-hero">
+      <p class="vitrin-ust">Dijital Davetiye Stüdyosu</p>
+      <h1 class="vitrin-baslik">Telefonda açılan,<br />hatırlanan davetiyeler</h1>
+      <p class="vitrin-aciklama">
+        Düğün, nişan, kına, doğum günü, açılış ve kurumsal etkinlikler için;
+        WhatsApp'tan paylaşınca görselli önizleme çıkan modern davetiyeler.
+      </p>
+      <a class="btn" href={`/davet/${gosterilecek[0]?.slug}`}><Icon name="kalp" size={18} />Örnek Davetiyeyi Aç</a>
+    </header>
+
+    <section class="vitrin-liste" aria-label="Şablonlar">
+      <p class="bolum-ust">Şablonlar</p>
+      <h2 class="bolum-baslik" style="color: var(--ivory)">Örnek Çalışmalar</h2>
+
+      <div class="kartlar">
+        {gosterilecek.map((d) => (
+          <a class="kart" href={`/davet/${d.slug}`}>
+            <div class="kart-foto duo">
+              <img src={d.heroFoto.src} alt={d.heroFoto.alt} loading="lazy" />
+            </div>
+            <div class="kart-ic">
+              <span class="kart-etiket" style={`background:${d.temaRengi}`}>{d.etkinlikTuru}</span>
+              <h3 class="kart-isim">{d.isimler}</h3>
+              <p class="kart-tarih">{d.tarihMetni}</p>
+              <span class="kart-link">Davetiyeyi gör →</span>
+            </div>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <footer class="vitrin-footer">
+      <p>Her davetiye tek bir link. Telefonda açılır, kurulum gerektirmez.</p>
+      <p class="vitrin-footer-imza">Dijital Davetiye Stüdyosu · {new Date().getFullYear()}</p>
+    </footer>
+  </main>
+</body>
+</html>
+
+<style>
+  .vitrin { max-width: 720px; margin-inline: auto; }
+
+  .vitrin-hero {
+    text-align: center;
+    padding: 80px 24px 56px;
+    display: grid;
+    justify-items: center;
+    gap: 18px;
+    background: radial-gradient(120% 80% at 50% 0%, #2a3a31 0%, var(--ink) 65%);
+  }
+  .vitrin-ust {
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    font-size: 0.72rem;
+    color: var(--clay);
+    margin: 0;
+  }
+  .vitrin-baslik {
+    font-size: clamp(2.1rem, 8vw, 3.2rem);
+    color: var(--ivory);
+  }
+  .vitrin-aciklama {
+    color: var(--sage);
+    max-width: 46ch;
+    margin: 0;
+  }
+
+  .vitrin-liste { padding: 56px 22px; }
+
+  .kartlar {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 18px;
+    margin-top: 28px;
+  }
+  @media (min-width: 640px) {
+    .kartlar { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  .kart {
+    text-decoration: none;
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: rgba(143,166,142,.06);
+    border: 1px solid rgba(143,166,142,.16);
+    transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+    display: block;
+  }
+  .kart:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow);
+    border-color: var(--clay);
+  }
+  .kart-foto { aspect-ratio: 4 / 3; }
+  .kart-foto img { transition: transform .5s ease; }
+  .kart:hover .kart-foto img { transform: scale(1.06); }
+  .kart-ic { padding: 18px 18px 20px; display: grid; gap: 6px; }
+  .kart-etiket {
+    justify-self: start;
+    color: #fff;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 999px;
+  }
+  .kart-isim {
+    font-family: var(--font-baslik);
+    font-size: 1.5rem;
+    color: var(--ivory);
+    margin: 4px 0 0;
+  }
+  .kart-tarih { color: var(--sage); font-size: 0.9rem; margin: 0; }
+  .kart-link { color: var(--clay); font-weight: 600; font-size: 0.9rem; margin-top: 6px; }
+
+  .vitrin-footer {
+    text-align: center;
+    padding: 40px 24px 64px;
+    color: var(--sage);
+    border-top: 1px solid rgba(143,166,142,.14);
+  }
+  .vitrin-footer p { margin: 0 0 8px; }
+  .vitrin-footer-imza {
+    font-size: 0.74rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--olive);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .kart, .kart-foto img { transition: none; }
+  }
+</style>

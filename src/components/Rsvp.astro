@@ -1,0 +1,233 @@
+---
+// KATILIM FORMU — sunucu YOK. Gönder'e basınca WhatsApp'ı hazır mesajla açar.
+import Icon from './Icon.astro';
+interface Props {
+  whatsappNumara: string;   // başında + olmadan: 905XXXXXXXXX
+  etkinlikAdi: string;      // mesajda geçecek: "Emre & Funda Düğün"
+}
+const { whatsappNumara, etkinlikAdi } = Astro.props;
+---
+
+<section class="bolum bolum--acik rsvp reveal" id="katilim" aria-label="Katılım bildirimi">
+  <span class="bolum-ikon" aria-hidden="true"><Icon name="zarf" /></span>
+  <p class="bolum-ust">Lütfen Bildirin</p>
+  <h2 class="bolum-baslik" style="color: var(--ink)">Katılım Formu</h2>
+  <p class="rsvp-alt">Bize katılıp katılamayacağınızı iletmeniz bizim için çok değerli.</p>
+
+  <form class="rsvp-form" id="rsvp-form" data-numara={whatsappNumara} data-etkinlik={etkinlikAdi} novalidate>
+    <label class="rsvp-alan">
+      <span>Ad Soyad</span>
+      <input type="text" name="ad" id="rsvp-ad" required autocomplete="name" placeholder="Adınız ve soyadınız" />
+    </label>
+
+    <fieldset class="rsvp-secim">
+      <legend>Katılım durumu</legend>
+      <label class="rsvp-radyo">
+        <input type="radio" name="durum" value="Katılıyorum" checked />
+        <span>Katılıyorum</span>
+      </label>
+      <label class="rsvp-radyo">
+        <input type="radio" name="durum" value="Katılamıyorum" />
+        <span>Katılamıyorum</span>
+      </label>
+    </fieldset>
+
+    <label class="rsvp-alan rsvp-kisi" id="kisi-alan">
+      <span>Kişi Sayısı</span>
+      <input type="number" name="kisi" id="rsvp-kisi" min="1" max="20" value="1" inputmode="numeric" />
+    </label>
+
+    <label class="rsvp-alan">
+      <span>Notunuz <em>(opsiyonel)</em></span>
+      <input type="text" name="not" id="rsvp-notu" placeholder="İletmek istediğiniz bir mesaj" />
+    </label>
+
+    <button type="submit" class="btn rsvp-gonder">
+      <Icon name="mesaj" size={18} />WhatsApp ile Gönder
+    </button>
+    <p class="rsvp-not">Gönder'e basınca WhatsApp uygulaması hazır mesajla açılır.</p>
+  </form>
+
+  <div class="rsvp-basari" id="rsvp-basari" hidden>
+    <span class="rsvp-basari-ikon"><Icon name="onay" size={30} /></span>
+    <h3 id="rsvp-basari-baslik">Teşekkürler!</h3>
+    <p id="rsvp-basari-metin">WhatsApp uygulaması açılıyor…</p>
+  </div>
+</section>
+
+<style>
+  .rsvp { text-align: center; }
+  .rsvp-alt {
+    color: var(--olive);
+    max-width: 34ch;
+    margin: 0 auto 26px;
+    font-size: 0.96rem;
+  }
+  .rsvp-form {
+    display: grid;
+    gap: 18px;
+    max-width: 400px;
+    margin: 0 auto;
+    text-align: left;
+    background: #fff;
+    padding: 26px 22px;
+    border-radius: 20px;
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow);
+  }
+  .rsvp-form[hidden] { display: none; }
+  .rsvp-alan { display: grid; gap: 7px; }
+  .rsvp-alan > span, .rsvp-secim legend {
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--ink);
+    text-transform: uppercase;
+  }
+  .rsvp-form input[type="text"],
+  .rsvp-form input[type="number"] {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1.5px solid var(--line);
+    border-radius: 12px;
+    background: #fff;
+    font-family: var(--font-govde);
+    font-size: 1rem;
+    color: var(--ink);
+  }
+  .rsvp-form input:focus {
+    border-color: var(--clay);
+    outline: none;
+  }
+  .rsvp-secim {
+    border: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 10px;
+  }
+  .rsvp-radyo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 13px 16px;
+    border: 1.5px solid var(--line);
+    border-radius: 12px;
+    cursor: pointer;
+    background: #fff;
+    transition: border-color .15s ease, background .15s ease;
+  }
+  .rsvp-radyo:has(input:checked) {
+    border-color: var(--clay);
+    background: rgba(192,132,87,.08);
+  }
+  .rsvp-radyo input { accent-color: var(--clay); width: 18px; height: 18px; }
+  .rsvp-radyo span { color: var(--ink); font-weight: 500; }
+  .rsvp-kisi { transition: opacity .2s ease; }
+  .rsvp-kisi[hidden] { display: none; }
+  .rsvp-gonder { width: 100%; margin-top: 4px; }
+  .rsvp-not {
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--olive);
+    margin: 0;
+  }
+  .rsvp-alan em {
+    font-style: normal;
+    color: var(--sage);
+    font-weight: 500;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+  .rsvp-basari {
+    max-width: 400px;
+    margin: 0 auto;
+    background: #fff;
+    padding: 34px 24px;
+    border-radius: 20px;
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow);
+    text-align: center;
+    animation: basariGir .5s ease both;
+  }
+  .rsvp-basari[hidden] { display: none; }
+  .rsvp-basari-ikon {
+    display: grid;
+    place-items: center;
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 14px;
+    border-radius: 50%;
+    color: #fff;
+    background: var(--clay);
+  }
+  .rsvp-basari h3 {
+    font-family: var(--font-baslik);
+    color: var(--ink);
+    font-size: 1.6rem;
+    margin: 0 0 6px;
+  }
+  .rsvp-basari p { color: var(--olive); margin: 0; }
+  @keyframes basariGir {
+    from { opacity: 0; transform: scale(.96); }
+    to   { opacity: 1; transform: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .rsvp-basari { animation: none; }
+  }
+</style>
+
+<script>
+  import { konfetiPatlat } from '../scripts/confetti';
+  const form = document.getElementById('rsvp-form') as HTMLFormElement | null;
+  const kisiAlan = document.getElementById('kisi-alan');
+  const durumRadyo = form?.querySelectorAll<HTMLInputElement>('input[name="durum"]');
+
+  // "Katılamıyorum" seçilince kişi sayısını gizle
+  durumRadyo?.forEach((r) => {
+    r.addEventListener('change', () => {
+      const katiliyor = form?.querySelector<HTMLInputElement>('input[name="durum"]:checked')?.value === 'Katılıyorum';
+      if (kisiAlan) kisiAlan.hidden = !katiliyor;
+    });
+  });
+
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const ad = (document.getElementById('rsvp-ad') as HTMLInputElement).value.trim();
+    if (!ad) {
+      (document.getElementById('rsvp-ad') as HTMLInputElement).focus();
+      return;
+    }
+    const durum = form.querySelector<HTMLInputElement>('input[name="durum"]:checked')?.value ?? 'Katılıyorum';
+    const kisi = (document.getElementById('rsvp-kisi') as HTMLInputElement).value || '1';
+    const notu = (document.getElementById('rsvp-notu') as HTMLInputElement).value.trim();
+    const etkinlik = form.dataset.etkinlik || 'Etkinlik';
+    const numara = form.dataset.numara || '';
+
+    let mesaj = `Merhaba! ${etkinlik} davetiyeniz için katılım bildirimi:\n\n`;
+    mesaj += `Ad Soyad: ${ad}\n`;
+    mesaj += `Durum: ${durum}`;
+    if (durum === 'Katılıyorum') mesaj += `\nKişi Sayısı: ${kisi}`;
+    if (notu) mesaj += `\nNot: ${notu}`;
+
+    const url = `https://wa.me/${numara}?text=${encodeURIComponent(mesaj)}`;
+
+    // Başarı ekranını göster
+    const basari = document.getElementById('rsvp-basari');
+    const basariBaslik = document.getElementById('rsvp-basari-baslik');
+    if (basari && basariBaslik) {
+      basariBaslik.textContent =
+        durum === 'Katılıyorum' ? `Teşekkürler, ${ad.split(' ')[0]}!` : 'Bildiriminiz alındı';
+      form.hidden = true;
+      basari.hidden = false;
+    }
+
+    // Katılıyorsa önce kutlama konfetisi, sonra WhatsApp'ı aç
+    if (durum === 'Katılıyorum') {
+      konfetiPatlat({ y: window.innerHeight * 0.5, adet: 160 });
+      setTimeout(() => window.open(url, '_blank', 'noopener'), 900);
+    } else {
+      setTimeout(() => window.open(url, '_blank', 'noopener'), 300);
+    }
+  });
+</script>

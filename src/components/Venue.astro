@@ -1,0 +1,179 @@
+---
+// MEKÂN — ad, adres, "Yol tarifi" (Maps) ve "Takvime ekle" (.ics indirir, kütüphanesiz).
+import Icon from './Icon.astro';
+interface Props {
+  mekanAdi: string;
+  mekanAdres: string;
+  haritaLinki: string;
+  tarihISO: string;
+  bitisISO?: string;
+  baslik: string;   // takvim etkinlik başlığı
+}
+const { mekanAdi, mekanAdres, haritaLinki, tarihISO, bitisISO, baslik } = Astro.props;
+
+// Ücretsiz Google Maps gömme (API anahtarı GEREKMEZ). Adresten otomatik konum bulur.
+const haritaEmbed = `https://www.google.com/maps?q=${encodeURIComponent(mekanAdi + ', ' + mekanAdres)}&z=15&output=embed`;
+---
+
+<section class="bolum mekan reveal" aria-label="Mekân bilgisi">
+  <span class="bolum-ikon" aria-hidden="true"><Icon name="harita" /></span>
+  <p class="bolum-ust">Mekân</p>
+  <h2 class="bolum-baslik">{mekanAdi}</h2>
+  <p class="mekan-adres">{mekanAdres}</p>
+
+  <div class="mekan-harita">
+    <iframe
+      title={`${mekanAdi} harita konumu`}
+      src={haritaEmbed}
+      loading="lazy"
+      referrerpolicy="no-referrer-when-downgrade"
+      allowfullscreen
+    ></iframe>
+  </div>
+
+  <div
+    class="mekan-aksiyon"
+    data-baslik={baslik}
+    data-mekan={`${mekanAdi}, ${mekanAdres}`}
+    data-baslangic={tarihISO}
+    data-bitis={bitisISO ?? ''}
+  >
+    <div class="mekan-butonlar">
+      <a class="btn" href={haritaLinki} target="_blank" rel="noopener"><Icon name="yon" size={18} />Yol Tarifi</a>
+      <button class="btn btn--hayalet" id="takvim-ics" type="button" style="--fg: var(--ivory); border-color: var(--sage);">
+        <Icon name="takvim" size={18} />Takvime & Alarm Ekle
+      </button>
+    </div>
+    <button class="takvim-google" id="takvim-google" type="button">veya Google Takvim'de aç →</button>
+    <p class="takvim-not">Hatırlatma alarmı 1 gün ve 3 saat önce çalar · iPhone, Android ve Outlook uyumlu</p>
+  </div>
+</section>
+
+<style>
+  .mekan { text-align: center; }
+  .mekan-adres {
+    color: var(--sage);
+    max-width: 32ch;
+    margin: 6px auto 22px;
+  }
+  .mekan-harita {
+    aspect-ratio: 16 / 10;
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 22px;
+    border: 1px solid rgba(167, 190, 176, 0.22);
+    box-shadow: var(--shadow);
+  }
+  .mekan-harita iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+    filter: grayscale(0.15) contrast(1.02);
+  }
+  .mekan-butonlar {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .mekan-butonlar .btn--hayalet:hover { background: var(--olive); }
+  .mekan-aksiyon {
+    display: grid;
+    gap: 12px;
+    justify-items: center;
+  }
+  .takvim-google {
+    background: none;
+    border: none;
+    color: var(--clay);
+    font-family: var(--font-govde);
+    font-weight: 600;
+    font-size: 0.92rem;
+    cursor: pointer;
+    padding: 2px 6px;
+  }
+  .takvim-google:hover { text-decoration: underline; }
+  .takvim-not {
+    font-size: 0.76rem;
+    color: var(--sage);
+    margin: 0;
+    max-width: 36ch;
+  }
+</style>
+
+<script>
+  const kutu = document.querySelector<HTMLElement>('.mekan-aksiyon');
+  const icsBtn = document.getElementById('takvim-ics');
+  const googleBtn = document.getElementById('takvim-google');
+
+  // "2026-09-19T19:00" -> "20260919T190000" (takvim biçimi)
+  function icsTarih(iso: string): string {
+    const d = new Date(iso);
+    const p = (n: number) => String(n).padStart(2, '0');
+    return (
+      d.getFullYear().toString() +
+      p(d.getMonth() + 1) +
+      p(d.getDate()) +
+      'T' +
+      p(d.getHours()) +
+      p(d.getMinutes()) +
+      '00'
+    );
+  }
+
+  function veri() {
+    const bas = kutu?.dataset.baslangic || '';
+    return {
+      baslik: kutu?.dataset.baslik || 'Etkinlik',
+      mekan: kutu?.dataset.mekan || '',
+      bas,
+      bit: kutu?.dataset.bitis || bas,
+    };
+  }
+
+  // APPLE / ANDROID / OUTLOOK — .ics dosyası (hatırlatma ALARMI ile).
+  // Tek dosya her üç sistemde de çalışır; ayrı buton gerekmez.
+  icsBtn?.addEventListener('click', () => {
+    const { baslik, mekan, bas, bit } = veri();
+    const ics = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//Davetiye Studyo//TR',
+      'CALSCALE:GREGORIAN',
+      'BEGIN:VEVENT',
+      `UID:${Date.now()}@davetiye`,
+      `DTSTAMP:${icsTarih(new Date().toISOString())}`,
+      `DTSTART:${icsTarih(bas)}`,
+      `DTEND:${icsTarih(bit)}`,
+      `SUMMARY:${baslik}`,
+      `LOCATION:${mekan.replace(/,/g, '\\,')}`,
+      'BEGIN:VALARM', 'ACTION:DISPLAY', 'DESCRIPTION:Hatırlatma', 'TRIGGER:-P1D', 'END:VALARM',
+      'BEGIN:VALARM', 'ACTION:DISPLAY', 'DESCRIPTION:Hatırlatma', 'TRIGGER:-PT3H', 'END:VALARM',
+      'END:VEVENT',
+      'END:VCALENDAR',
+    ].join('\r\n');
+
+    const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'davetiye.ics';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  });
+
+  // GOOGLE TAKVİM (web/Android) — hazır etkinlik ekranı açılır.
+  googleBtn?.addEventListener('click', () => {
+    const { baslik, mekan, bas, bit } = veri();
+    const url =
+      'https://calendar.google.com/calendar/render?action=TEMPLATE' +
+      `&text=${encodeURIComponent(baslik)}` +
+      `&dates=${icsTarih(bas)}/${icsTarih(bit)}` +
+      `&location=${encodeURIComponent(mekan)}` +
+      `&details=${encodeURIComponent('Davetli olduğunuz etkinlik. Detaylar davetiyede.')}`;
+    window.open(url, '_blank', 'noopener');
+  });
+</script>

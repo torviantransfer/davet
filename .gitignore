@@ -1,0 +1,15 @@
+# bağımlılıklar
+node_modules/
+
+# çıktı
+dist/
+.astro/
+
+# ortam
+.env
+.env.production
+
+# editör / işletim sistemi
+.DS_Store
+.vscode/
+Thumbs.db

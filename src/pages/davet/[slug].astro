@@ -1,0 +1,16 @@
+---
+// DAVETİYE SAYFASI — her davetiye kendi adresinde: /davet/<slug>
+// Astro, veri listesindeki her kayıt için otomatik bir sayfa üretir.
+import Invitation from '../../layouts/Invitation.astro';
+import { davetiyeler } from '../../data';
+
+export function getStaticPaths() {
+  return davetiyeler.map((dav) => ({
+    params: { slug: dav.slug },
+    props: { dav },
+  }));
+}
+
+const { dav } = Astro.props;
+---
+<Invitation dav={dav} />

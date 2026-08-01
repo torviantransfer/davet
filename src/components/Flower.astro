@@ -1,0 +1,37 @@
+---
+// ÇİÇEK — kaydırınca açılan (bloom) dekoratif SVG çiçek.
+// Bir ".reveal" bölümünün içinde durur; bölüm ekrana girip ".gorundu"
+// olduğunda yaprakları sırayla açılır. (Animasyon CSS'te: global.css)
+interface Props {
+  size?: number;
+  renk?: string;    // dış yaprak rengi
+  renkIc?: string;  // iç yaprak rengi
+  goz?: string;     // orta göbek rengi
+}
+const { size = 100, renk = '#CE8E5C', renkIc = '#E0A874', goz = '#F5EFE4' } = Astro.props;
+
+const disYapraklar = [0, 60, 120, 180, 240, 300];
+const icYapraklar = [30, 90, 150, 210, 270, 330];
+---
+
+<span class="cicek" style={`width:${size}px;height:${size}px`} aria-hidden="true">
+  <svg viewBox="0 0 100 100" width={size} height={size}>
+    {disYapraklar.map((a, i) => (
+      <ellipse
+        class="petal"
+        cx="50" cy="24" rx="13" ry="24"
+        fill={renk}
+        style={`--a:${a}deg; transition-delay:${(i * 0.06).toFixed(2)}s`}
+      />
+    ))}
+    {icYapraklar.map((a, i) => (
+      <ellipse
+        class="petal petal-ic"
+        cx="50" cy="32" rx="8" ry="16"
+        fill={renkIc}
+        style={`--a:${a}deg; transition-delay:${(0.2 + i * 0.05).toFixed(2)}s`}
+      />
+    ))}
+    <circle class="goz" cx="50" cy="50" r="8" fill={goz} />
+  </svg>
+</span>

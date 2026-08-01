@@ -1,0 +1,112 @@
+---
+// PROGRAM AKIŞI — dikey zaman çizgisi görünümünde.
+import type { ProgramAdimi } from '../data/types';
+import Icon from './Icon.astro';
+interface Props {
+  program: ProgramAdimi[];
+}
+const { program } = Astro.props;
+---
+
+<section class="bolum program reveal" aria-label="Program akışı">
+  <span class="bolum-ikon" aria-hidden="true"><Icon name="saat" /></span>
+  <p class="bolum-ust">Program</p>
+  <h2 class="bolum-baslik">Günün Akışı</h2>
+  <ol class="cizgi">
+    {program.map((adim) => (
+      <li class="cizgi-adim">
+        <span class="cizgi-nokta" aria-hidden="true"></span>
+        <div class="cizgi-ic">
+          <span class="cizgi-saat">{adim.saat}</span>
+          <h3 class="cizgi-baslik">{adim.baslik}</h3>
+          {adim.aciklama && <p class="cizgi-aciklama">{adim.aciklama}</p>}
+        </div>
+      </li>
+    ))}
+  </ol>
+</section>
+
+<style>
+  .cizgi {
+    list-style: none;
+    margin: 28px 0 0;
+    padding: 0 4px 0 8px;
+    position: relative;
+  }
+  .cizgi::before {
+    content: '';
+    position: absolute;
+    left: 13px;
+    top: 6px;
+    bottom: 6px;
+    width: 1px;
+    background: linear-gradient(var(--sage), rgba(143,166,142,.2));
+  }
+  .cizgi-adim {
+    position: relative;
+    padding: 0 0 20px 42px;
+  }
+  .cizgi-adim:last-child { padding-bottom: 0; }
+  .cizgi-nokta {
+    position: absolute;
+    left: 7px;
+    top: 14px;
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    background: var(--clay);
+    box-shadow: 0 0 0 4px rgba(206,142,92,.18);
+    z-index: 1;
+  }
+  /* Hareketli nabız halkası */
+  .cizgi-nokta::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: 50%;
+    border: 2px solid var(--clay);
+    animation: nabiz 2.6s ease-out infinite;
+  }
+  .cizgi-adim:nth-child(2) .cizgi-nokta::after { animation-delay: .4s; }
+  .cizgi-adim:nth-child(3) .cizgi-nokta::after { animation-delay: .8s; }
+  .cizgi-adim:nth-child(4) .cizgi-nokta::after { animation-delay: 1.2s; }
+  .cizgi-adim:nth-child(5) .cizgi-nokta::after { animation-delay: 1.6s; }
+  .cizgi-adim:nth-child(6) .cizgi-nokta::after { animation-delay: 2s; }
+  @keyframes nabiz {
+    0%   { transform: scale(.6); opacity: .7; }
+    70%  { transform: scale(2.2); opacity: 0; }
+    100% { opacity: 0; }
+  }
+  .cizgi-ic {
+    background: rgba(167,190,176,.05);
+    border: 1px solid rgba(167,190,176,.14);
+    border-radius: 14px;
+    padding: 12px 16px;
+    transition: transform .2s ease, border-color .2s ease, background .2s ease;
+  }
+  .cizgi-adim:hover .cizgi-ic {
+    transform: translateX(4px);
+    border-color: rgba(206,142,92,.4);
+    background: rgba(206,142,92,.06);
+  }
+  .cizgi-saat {
+    font-family: var(--font-baslik);
+    font-size: 1.05rem;
+    color: var(--clay);
+    display: block;
+    margin-bottom: 2px;
+  }
+  .cizgi-baslik {
+    font-size: 1.15rem;
+    color: var(--ivory);
+    margin: 0;
+  }
+  .cizgi-aciklama {
+    margin: 4px 0 0;
+    font-size: 0.92rem;
+    color: var(--sage);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .cizgi-nokta::after { animation: none; opacity: 0; }
+  }
+</style>

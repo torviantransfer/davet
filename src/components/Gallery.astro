@@ -1,0 +1,168 @@
+---
+// FOTOĞRAF GALERİSİ — ilk kare geniş, altındakiler kare ızgara.
+import type { Foto } from '../data/types';
+import Icon from './Icon.astro';
+interface Props {
+  galeri: Foto[];
+}
+const { galeri } = Astro.props;
+const [ilk, ...digerleri] = galeri;
+---
+
+<section class="bolum bolum--acik galeri reveal" aria-label="Fotoğraf galerisi">
+  <span class="bolum-ikon" aria-hidden="true"><Icon name="kamera" /></span>
+  <p class="bolum-ust">Anılar</p>
+  <h2 class="bolum-baslik" style="color: var(--ink)">Galeri</h2>
+
+  <div class="galeri-liste">
+    {ilk && (
+      <button class={`galeri-oge galeri-oge--genis duo ${ilk.video ? 'galeri-video' : ''}`} data-buyut={ilk.video ?? ilk.src} data-tur={ilk.video ? 'video' : 'foto'} type="button" aria-label={`${ilk.video ? 'Videoyu oynat' : 'Büyüt'}: ${ilk.alt}`}>
+        <img src={ilk.src} alt={ilk.alt} loading="lazy" />
+        {ilk.video && <span class="oynat" aria-hidden="true"><Icon name="oynat" size={26} /></span>}
+      </button>
+    )}
+    <div class="galeri-izgara">
+      {digerleri.map((f) => (
+        <button class={`galeri-oge duo ${f.video ? 'galeri-video' : ''}`} data-buyut={f.video ?? f.src} data-tur={f.video ? 'video' : 'foto'} type="button" aria-label={`${f.video ? 'Videoyu oynat' : 'Büyüt'}: ${f.alt}`}>
+          <img src={f.src} alt={f.alt} loading="lazy" />
+          {f.video && <span class="oynat" aria-hidden="true"><Icon name="oynat" size={22} /></span>}
+        </button>
+      ))}
+    </div>
+  </div>
+</section>
+
+<!-- Büyütme (lightbox) katmanı — fotoğraf veya video -->
+<div class="buyut" id="buyut" hidden>
+  <button class="buyut-kapat" id="buyut-kapat" type="button" aria-label="Kapat">×</button>
+  <img id="buyut-img" src="" alt="Büyütülmüş fotoğraf" hidden />
+  <video id="buyut-video" controls playsinline hidden></video>
+</div>
+
+<style>
+  .galeri-liste { margin-top: 24px; display: grid; gap: 10px; }
+  .galeri-oge {
+    padding: 0;
+    border: none;
+    cursor: zoom-in;
+    border-radius: var(--radius);
+    aspect-ratio: 1 / 1;
+    display: block;
+  }
+  .galeri-oge--genis { aspect-ratio: 16 / 10; }
+  .galeri-oge img {
+    transition: transform .5s ease;
+    border-radius: var(--radius);
+  }
+  .galeri-oge:hover img { transform: scale(1.05); }
+  .galeri-izgara {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  /* Video karesi: oynat düğmesi + hafif karartma */
+  .galeri-video::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 30, 24, 0.28);
+    z-index: 1;
+    border-radius: var(--radius);
+    pointer-events: none;
+  }
+  .oynat {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    pointer-events: none;
+  }
+  .oynat :global(svg) {
+    fill: #fff;
+    background: rgba(206, 142, 92, 0.94);
+    border-radius: 50%;
+    padding: 13px;
+    box-shadow: 0 10px 26px rgba(0,0,0,.4);
+    transition: transform .25s ease;
+  }
+  .galeri-video:hover .oynat :global(svg) { transform: scale(1.08); }
+
+  .buyut {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: rgba(15, 22, 18, 0.94);
+    display: grid;
+    place-items: center;
+    padding: 20px;
+    animation: solgun .25s ease;
+  }
+  /* "hidden" özniteliği display:grid'i ezmesin diye açık kural */
+  .buyut[hidden] { display: none; }
+  .buyut img,
+  .buyut video {
+    max-width: 100%;
+    max-height: 86vh;
+    border-radius: 12px;
+    object-fit: contain;
+  }
+  .buyut img[hidden], .buyut video[hidden] { display: none; }
+  .buyut-kapat {
+    position: absolute;
+    top: 16px;
+    right: 18px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255,255,255,.12);
+    color: #fff;
+    font-size: 1.6rem;
+    line-height: 1;
+    cursor: pointer;
+  }
+  @keyframes solgun { from { opacity: 0; } to { opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) {
+    .buyut { animation: none; }
+    .galeri-oge img { transition: none; }
+  }
+</style>
+
+<script>
+  const katman = document.getElementById('buyut');
+  const buyutImg = document.getElementById('buyut-img') as HTMLImageElement | null;
+  const buyutVideo = document.getElementById('buyut-video') as HTMLVideoElement | null;
+  const kapat = document.getElementById('buyut-kapat');
+
+  function ac(src: string, tur: string) {
+    if (!katman) return;
+    if (tur === 'video' && buyutVideo) {
+      if (buyutImg) buyutImg.hidden = true;
+      buyutVideo.hidden = false;
+      buyutVideo.src = src;
+      buyutVideo.play().catch(() => {});
+    } else if (buyutImg) {
+      if (buyutVideo) { buyutVideo.hidden = true; buyutVideo.pause(); buyutVideo.removeAttribute('src'); }
+      buyutImg.hidden = false;
+      buyutImg.src = src;
+    }
+    katman.hidden = false;
+    document.body.style.overflow = 'hidden';
+    kapat?.focus();
+  }
+  function kapatFn() {
+    if (!katman) return;
+    katman.hidden = true;
+    document.body.style.overflow = '';
+    if (buyutVideo) { buyutVideo.pause(); buyutVideo.removeAttribute('src'); }
+  }
+
+  document.querySelectorAll<HTMLButtonElement>('[data-buyut]').forEach((btn) => {
+    btn.addEventListener('click', () => ac(btn.dataset.buyut as string, btn.dataset.tur || 'foto'));
+  });
+  kapat?.addEventListener('click', kapatFn);
+  katman?.addEventListener('click', (e) => { if (e.target === katman) kapatFn(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') kapatFn(); });
+</script>

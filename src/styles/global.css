@@ -1,0 +1,217 @@
+/* ============================================================
+   TASARIM SİSTEMİ — davetiye stüdyosu
+   Renk, tipografi ve ortak stiller. Tek yerden yönetilir.
+   ============================================================ */
+
+:root {
+  /* — Palet — (zarif & premium; klişe altın-krem-kaligrafiden uzak) */
+  --ink:      #0F1E18;   /* çok koyu çam yeşili — ana zemin */
+  --olive:    #1C3A30;   /* zümrüt-zeytin — ikincil koyu */
+  --sage:     #A7BEB0;   /* adaçayı — yumuşak açık vurgu */
+  --ivory:    #F5EFE4;   /* sıcak fildişi — açık zemin/metin */
+  --clay:     #CE8E5C;   /* bakır/kil — sıcak vurgu (altın yerine) */
+  --clay-2:   #E0A874;   /* açık bakır — küçük parıltılar */
+
+  --ivory-2:  #E7DCC9;   /* biraz daha koyu fildişi */
+  --line:     rgba(15, 30, 24, 0.12);
+  --shadow:   0 22px 50px -28px rgba(0, 0, 0, 0.7);
+
+  /* — Tipografi — */
+  --font-baslik: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --font-govde:  'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  /* — Ölçü — */
+  --max: 560px;             /* mobil öncelikli, ortalanmış */
+  --bar-h: 68px;            /* sabit alt çubuk yüksekliği */
+  --radius: 18px;
+
+  /* — Duotone filtre (fotoğrafları birbirine yakınlaştırır) — */
+  --duo-shadow: #14261F;    /* gölgelerin rengi (yeşilimsi) */
+  --duo-light:  #efe4d1;    /* aydınlıkların rengi (sıcak) */
+}
+
+* { box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  /* Her bölüm ekrana oturur; kaydırınca bölüm bölüm akıcı geçer */
+  scroll-snap-type: y proximity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; scroll-snap-type: none; }
+}
+
+body {
+  margin: 0;
+  background: var(--ink);
+  color: var(--ivory);
+  font-family: var(--font-govde);
+  font-size: 17px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Davetiyeyi ortalayan mobil öncelikli çerçeve */
+.sayfa {
+  max-width: var(--max);
+  margin-inline: auto;
+  position: relative;
+  overflow-x: clip;
+  padding-bottom: calc(var(--bar-h) + env(safe-area-inset-bottom));
+}
+
+img { display: block; max-width: 100%; }
+
+h1, h2, h3 {
+  font-family: var(--font-baslik);
+  font-weight: 500;
+  line-height: 1.1;
+  margin: 0;
+}
+
+a { color: inherit; }
+
+/* — Başlık düzeni (bölüm başlıkları) — */
+.bolum {
+  padding: 76px 22px;
+  min-height: 100svh;             /* her bölüm ekrana otursun */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  scroll-snap-align: start;       /* kaydırınca bölüme otur */
+}
+/* Bölüm başındaki yuvarlak ikon rozeti */
+.bolum-ikon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 16px;
+  border-radius: 50%;
+  color: var(--clay);
+  border: 1px solid rgba(206, 142, 92, 0.35);
+  background: rgba(206, 142, 92, 0.08);
+}
+.bolum-baslik {
+  font-size: clamp(1.7rem, 8vw, 2.4rem);
+  text-align: center;
+  margin-bottom: 8px;
+}
+.bolum-ust {
+  text-align: center;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  color: var(--clay);
+  margin-bottom: 14px;
+  font-weight: 600;
+}
+
+/* Açık zeminli bölüm */
+.bolum--acik {
+  background: var(--ivory);
+  color: var(--ink);
+}
+.bolum--acik .bolum-ust { color: var(--clay); }
+
+/* — Butonlar — */
+.btn {
+  --bg: var(--clay);
+  --fg: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 14px 22px;
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-govde);
+  font-weight: 600;
+  font-size: 0.98rem;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+}
+.btn svg { flex: 0 0 auto; }
+.btn:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+.btn--hayalet {
+  --bg: transparent;
+  --fg: var(--ink);
+  border: 1.5px solid var(--ink);
+}
+.btn--hayalet:hover { background: var(--ink); color: var(--ivory); }
+
+/* — Klavye odağı görünürlüğü (erişilebilirlik) — */
+:focus-visible {
+  outline: 3px solid var(--clay);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* — Duotone fotoğraf sarmalayıcı — */
+.duo {
+  position: relative;
+  overflow: hidden;
+  background: var(--duo-shadow);
+}
+.duo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(1) contrast(1.05) brightness(1.02);
+}
+.duo::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(var(--duo-shadow), var(--duo-light));
+  mix-blend-mode: lighten;
+  opacity: 0.62;
+  pointer-events: none;
+}
+
+/* — Kaydırınca içerik akıcı belirir (bölüm içindekiler sırayla girer) — */
+.reveal > * {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity .75s cubic-bezier(.22, .61, .36, 1),
+              transform .75s cubic-bezier(.22, .61, .36, 1);
+  will-change: opacity, transform;
+}
+.reveal.gorundu > * { opacity: 1; transform: none; }
+.reveal.gorundu > *:nth-child(1) { transition-delay: .04s; }
+.reveal.gorundu > *:nth-child(2) { transition-delay: .12s; }
+.reveal.gorundu > *:nth-child(3) { transition-delay: .20s; }
+.reveal.gorundu > *:nth-child(4) { transition-delay: .28s; }
+.reveal.gorundu > *:nth-child(5) { transition-delay: .36s; }
+.reveal.gorundu > *:nth-child(6) { transition-delay: .44s; }
+.reveal.gorundu > *:nth-child(n+7) { transition-delay: .5s; }
+@media (prefers-reduced-motion: reduce) {
+  .reveal > * { opacity: 1; transform: none; transition: none; }
+}
+
+/* — Çiçek açılması (aşağı kaydırınca yapraklar tek tek açılır) — */
+.cicek { display: inline-block; line-height: 0; }
+.cicek svg { overflow: visible; }
+.cicek .petal {
+  transform-box: view-box;
+  transform-origin: 50px 50px;
+  transform: rotate(var(--a)) scale(0);
+  transition: transform .85s cubic-bezier(.34, 1.4, .5, 1);
+}
+.cicek .goz {
+  transform-box: view-box;
+  transform-origin: 50px 50px;
+  transform: scale(0);
+  transition: transform .5s ease .42s;
+}
+.gorundu .cicek .petal { transform: rotate(var(--a)) scale(1); }
+.gorundu .cicek .goz { transform: scale(1); }
+@media (prefers-reduced-motion: reduce) {
+  .cicek .petal { transform: rotate(var(--a)) scale(1); transition: none; }
+  .cicek .goz { transform: scale(1); transition: none; }
+}

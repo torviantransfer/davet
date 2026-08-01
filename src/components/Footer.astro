@@ -1,0 +1,55 @@
+---
+// FOOTER — isim ve tarih.
+import Flower from './Flower.astro';
+interface Props {
+  isimler: string;
+  tarihMetni: string;
+  monogram: string;
+}
+const { isimler, tarihMetni, monogram } = Astro.props;
+---
+
+<footer class="footer reveal">
+  <span class="footer-cicek"><Flower size={58} renk="#CE8E5C" renkIc="#E0A874" goz="#F5EFE4" /></span>
+  <div class="footer-monogram" aria-hidden="true">{monogram}</div>
+  <p class="footer-isim">{isimler}</p>
+  <p class="footer-tarih">{tarihMetni}</p>
+  <p class="footer-imza">Sevgiyle hazırlandı</p>
+</footer>
+
+<style>
+  .footer {
+    text-align: center;
+    padding: 56px 22px 40px;
+    border-top: 1px solid rgba(143,166,142,.18);
+  }
+  .footer-cicek {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 14px;
+  }
+  .footer-monogram {
+    font-family: var(--font-baslik);
+    font-size: 2.4rem;
+    color: var(--clay);
+    margin-bottom: 12px;
+  }
+  .footer-isim {
+    font-family: var(--font-baslik);
+    font-size: 1.5rem;
+    color: var(--ivory);
+    margin: 0 0 4px;
+  }
+  .footer-tarih {
+    color: var(--sage);
+    font-size: 0.9rem;
+    margin: 0 0 18px;
+  }
+  .footer-imza {
+    font-size: 0.74rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--olive);
+    margin: 0;
+  }
+</style>

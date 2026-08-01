@@ -1,0 +1,40 @@
+---
+// DAVET METNİ — kısa, samimi.
+import Flower from './Flower.astro';
+interface Props {
+  metin: string;
+  isimler: string;
+}
+const { metin, isimler } = Astro.props;
+---
+
+<section class="bolum bolum--acik davet reveal">
+  <span class="davet-cicek"><Flower size={118} renk="#CE8E5C" renkIc="#E0A874" goz="#1C3A30" /></span>
+  <p class="bolum-ust">Davetlisiniz</p>
+  <p class="davet-metin">{metin}</p>
+  <p class="davet-imza">{isimler}</p>
+</section>
+
+<style>
+  .davet { text-align: center; }
+  .davet-cicek {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 6px;
+  }
+  .davet-metin {
+    font-family: var(--font-baslik);
+    font-size: clamp(1.2rem, 5.5vw, 1.55rem);
+    line-height: 1.5;
+    color: var(--ink);
+    max-width: 30ch;
+    margin: 0 auto 22px;
+    font-weight: 400;
+  }
+  .davet-imza {
+    font-family: var(--font-baslik);
+    font-size: 1.3rem;
+    color: var(--clay);
+    margin: 0;
+  }
+</style>
