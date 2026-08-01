@@ -20,6 +20,9 @@ const { dav } = Astro.props;
 // WhatsApp/sosyal önizleme için TAM adres üret (og:url, og:image mutlak olmalı).
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
 const etkinlikAdi = `${dav.isimler} ${dav.etkinlikTuru}`;
+// Kart başlığı ve otomatik üretilen kart görseli (/og/<slug>.png)
+const kartBaslik = `${dav.isimler} · ${dav.etkinlikTuru} Davetiyesi`;
+const ogKart = new URL(`/og/${dav.slug}.png`, Astro.site).href;
 ---
 <!doctype html>
 <html lang="tr">
@@ -41,20 +44,23 @@ const etkinlikAdi = `${dav.isimler} ${dav.etkinlikTuru}`;
        Vercel adresinle değiştirmeyi UNUTMA (yoksa og:url/og:image bozulur).
        ════════════════════════════════════════════════════════════════ -->
   <meta property="og:type" content="website" />
-  <meta property="og:title" content={dav.ogBaslik} />
+  <meta property="og:title" content={kartBaslik} />
   <meta property="og:description" content={dav.ogAciklama} />
-  <meta property="og:image" content={dav.ogGorsel} />
+  <meta property="og:image" content={ogKart} />
+  <meta property="og:image:secure_url" content={ogKart} />
+  <meta property="og:image:type" content="image/png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content={kartBaslik} />
   <meta property="og:url" content={canonical} />
   <meta property="og:locale" content="tr_TR" />
   <meta property="og:site_name" content={etkinlikAdi} />
 
   <!-- Twitter/X kartı (bonus) -->
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content={dav.ogBaslik} />
+  <meta name="twitter:title" content={kartBaslik} />
   <meta name="twitter:description" content={dav.ogAciklama} />
-  <meta name="twitter:image" content={dav.ogGorsel} />
+  <meta name="twitter:image" content={ogKart} />
 
   <!-- Tarayıcı üst çubuğu rengi -->
   <meta name="theme-color" content={dav.temaRengi} />

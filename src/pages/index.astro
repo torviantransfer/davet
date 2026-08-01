@@ -7,7 +7,8 @@ import '../styles/global.css';
 
 const gosterilecek = davetiyeler.filter((d) => d.vitrindeGoster);
 const canonical = new URL('/', Astro.site).href;
-const ogGorsel = new URL('/og-vitrin.jpg', Astro.site).href;
+// Ana sayfa kart görseli: ilk davetiyenin otomatik üretilen kartı
+const ogGorsel = new URL(`/og/${gosterilecek[0]?.slug ?? 'emre-funda'}.png`, Astro.site).href;
 ---
 <!doctype html>
 <html lang="tr">
@@ -22,6 +23,9 @@ const ogGorsel = new URL('/og-vitrin.jpg', Astro.site).href;
   <meta property="og:title" content="Dijital Davetiye Stüdyosu" />
   <meta property="og:description" content="Telefonda açılan modern dijital davetiyeler — düğün, doğum günü, açılış ve daha fazlası." />
   <meta property="og:image" content={ogGorsel} />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
   <meta property="og:url" content={canonical} />
   <meta property="og:locale" content="tr_TR" />
   <meta name="theme-color" content="#1E2B25" />
